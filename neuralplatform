@@ -1,0 +1,41 @@
+server {
+    listen 80;
+    server_name 192.168.3.165;
+
+    root /var/www/proyect/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ^~ /api/ {
+        root /var/www/api/NeuralWatchDog/public;
+        index index.php;
+
+        try_files $uri $uri/ /index.php?$query_string;
+
+        location ~ \.php$ {
+            include snippets/fastcgi-php.conf;
+            fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            include fastcgi_params;
+            fastcgi_read_timeout 1200;
+        }
+
+        location ~ /\. {
+            deny all;
+        }
+
+        add_header 'Access-Control-Allow-Origin' 'http://localhost:5173' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+
+        if ($request_method = OPTIONS) {
+            return 204;
+        }
+    }
+
+    access_log /var/log/nginx/combined_access.log;
+    error_log /var/log/nginx/combined_error.log;
+}
