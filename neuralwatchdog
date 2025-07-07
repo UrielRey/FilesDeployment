@@ -1,0 +1,29 @@
+server {
+    listen 8080;
+    server_name 201.175.1.19; # o tu_ip
+
+    root /var/www/api/NeuralWatchDog/public;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+        proxy_read_timeout 1200;
+        proxy_connect_timeout 1200;
+        proxy_send_timeout 1200;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_read_timeout 1200;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    access_log /var/log/nginx/laravel_access.log;
+    error_log /var/log/nginx/laravel_error.log;
+}
