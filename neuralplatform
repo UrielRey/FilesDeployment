@@ -2,11 +2,17 @@ server {
     listen 443 ssl;
     server_name x.x.x.x;
 
-    root /var/www/html/p/dist;
+    root /var/www/html/NeuralPlatform/dist;
     index index.html;
 
-    include snippets/self-signed.conf;
-    include snippets/ssl-params.conf;
+    ssl_certificate /etc/nginx/certs/mi_certificado.crt;
+    ssl_certificate_key /etc/nginx/certs/mi_clave.key;
+
+    # Si te dieron un CA Bundle/intermediate cert
+    ssl_trusted_certificate /etc/nginx/certs/ca_bundle.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
 
     location / {
         try_files $uri $uri/ /index.html;
@@ -16,9 +22,9 @@ server {
     error_log /var/log/nginx/combined_error.log;
 }
 
-# Redirige HTTP a HTTPS
+# Redirigir HTTP a HTTPS
 server {
     listen 80;
-    server_name x.x.x.x;
+    server_name 192.168.3.165;
     return 301 https://$host$request_uri;
 }
